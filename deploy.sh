@@ -1,12 +1,26 @@
 #!/bin/bash
 
+export $(cat .env | grep -v ^# | xargs)
+
 S3_BUCKET=$1
 STACK_NAME=$2
 
 USE_MSG="Usage: deploy.sh S3_BUCKET STACK_NAME"
 
+if [ -z "$AWS_ACCESS_KEY_ID" ]; then
+  echo "Missing AWS_ACCESS_KEY_ID ENV key"
+  echo $USE_MSG
+  exit 1
+fi
+
+if [ -z "$AWS_SECRET_ACCESS_KEY" ]; then
+  echo "Missing AWS_SECRET_ACCESS_KEY ENV key"
+  echo $USE_MSG
+  exit 1
+fi
+
 if [ -z "$S3_BUCKET" ]; then
-  echo "Missing S3_BUCKET and STACK_NAME"
+  echo "Missing S3_BUCKET"
   echo $USE_MSG
   exit 1
 fi

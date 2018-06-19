@@ -1,2 +1,3 @@
 package.yaml
 api-proxy-lambda.zip
+.env

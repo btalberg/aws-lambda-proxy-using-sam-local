@@ -28,7 +28,7 @@ Resources:
       AutoPublishAlias: !Ref AutoPublishAliasName
       FunctionName: !Sub ${FunctionName}-${StageName}
       Handler: index.handler
-      Runtime: nodejs6.10
+      Runtime: nodejs8.10
       CodeUri: ./api-proxy-lambda.zip
       Environment:
         Variables:
@@ -36,13 +36,19 @@ Resources:
           REGION: !Ref "AWS::Region"
       Role: !GetAtt ExampleFunctionIAMRole.Arn
       Events:
-        AnyRequest:
+        GetRequest:
           Type: Api
           Properties:
             Path: /
-            Method: ANY
-            RestApiId:
-              Ref: ExampleAPI
+            Method: GET
+            RestApiId: !Ref ExampleAPI
+        PostRequest:
+          Type: Api
+          Properties:
+            Path: /
+            Method: POST
+            RestApiId: !Ref ExampleAPI
+
 
   ExampleAPILambdaPermission:
     DependsOn : ExampleFunction
@@ -51,7 +57,7 @@ Resources:
       Action: lambda:InvokeFunction
       SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ExampleAPI}/*"
       FunctionName:
-        !Sub
+        Fn::Sub:
         - ${FuncArn}:current
         - { FuncArn: !GetAtt ExampleFunction.Arn }
       Principal: apigateway.amazonaws.com
@@ -89,7 +95,7 @@ Resources:
     Properties:
       StageName: !Ref StageName
       DefinitionBody:
-        swagger: 2.0
+        swagger: "2.0"
         info:
           title: !Sub API-${FunctionName}-${StageName}
         paths:
